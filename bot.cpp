@@ -6,13 +6,8 @@
 #include <string>
 #include <cstdlib>
 using namespace std;
-// currently we will be just trying on one single coin
-
-// class Stock {
-//     public:
-//         string name;
-//         float price;
-// };
+// currently we will be just trying on one single stock - APPL
+// in the future we will want to be able to trading multiple 
 
 class TradingBot {
     public:
@@ -20,9 +15,12 @@ class TradingBot {
         int id;
         float deposit;
         float balance;
-        // stock list
-        // history
-        
+        float previous_price;
+        float current_price;
+        float threshold = 0.5;
+        int quantity = 0;
+        float average_price = 0;
+
         TradingBot(){
             cout << " *** We just construct our trading bot ***" << endl;
             
@@ -86,20 +84,22 @@ class TradingBot {
         }
 
 
-        // void run() {
-        //     while (true) {
-        //         double currentPrice = fetchCurrentPrice();
-        //         double targetPrice = calculateTargetPrice(currentPrice);
+        void run() {
+            while (true) {
+                previous_price = current_price;
+                current_price = fetchCurrentPrice();
+                float price_change = current_price - previous_price;
 
-        //         if (currentPrice > targetPrice) {
-        //             executeBuyOrder();
-        //         } else if (currentPrice < targetPrice) {
-        //             executeSellOrder();
-        //         }
-
-        //         std::this_thread::sleep_for(std::chrono::minutes(1));
-        //     }
-        // }
+                if (abs(price_change)>threshold){
+                    if (price_change>0){
+                        execute_buy_order(current_price) // buy
+                    }else{
+                        execute_sell_order(current_price) //sell
+                    }
+                }
+                // std::this_thread::sleep_for(std::chrono::minutes(1));
+            }
+        }
 
     private:
         void printDeposit(){
@@ -128,26 +128,23 @@ class TradingBot {
             cout << "You just withdraw " + to_string(balance) + " from your account!" << endl;
         }
 
-    //     double fetchCurrentPrice() {
-    //         // Simulate fetching the current price from an API or data source
-    //         // Here, we'll generate a random price between 90 and 110
-    //         return 90.0 + static_cast<double>(rand()) / RAND_MAX * 20.0;
-    //     }
+        float fetchCurrentPrice() {
+            return 90.0;
+            //should be actually calling Alpha API
+        }
 
-    //     double calculateTargetPrice(double currentPrice) {
-    //         // Simulate a simple strategy for calculating the target price
-    //         // Here, we'll add a fixed percentage to the current price
-    //         return currentPrice * 1.05;  // Increase the price by 5%
-    //     }
+        void executeBuyOrder() {
+            std::cout << "Executing buy order" << std::endl;
+        }
 
-    //     void executeBuyOrder() {
-    //         // need to fetch API for doing orders
-    //         std::cout << "Executing buy order" << std::endl;
-    //     }
-
-    //     void executeSellOrder() {
-    //         std::cout << "Executing sell order" << std::endl;
-    //     }
+        void executeSellOrder() {
+            // will not be able to execute sell if we don't have stock
+            if quantity==0{
+                cout << "Not executing sell order: CURRENTLY HOLD 0 STOCK" << std::endl;
+                return
+            }
+            
+        }
 
 };
 
